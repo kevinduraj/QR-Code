@@ -1,6 +1,6 @@
 QR Code
 ================
-* QR Code Dector
+* QR Code Detector 
 
 ***
 
