@@ -1,5 +1,6 @@
 package finalproject;
 
+import Binarization.OtsuBinarize;
 import ErodeDilateOpenClose.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -11,41 +12,47 @@ import javax.imageio.ImageIO;
 public class Main {
 
     private static String filename;
+    
     public static void main(String[] args) throws IOException {
 
-        filename = "qrcode1";
+        filename = "qrcode3";
         ProcessHough(filename);    
                 
-        /*--------- Opening ----------*/
+        /*-------------- Opening -----------*/
         BufferedImage image1 = ReadBI2Gray("src/images/"+filename+"-b.png");                
         AbstractOperation opening1 = new Opening();
         BufferedImage bi1 = opening1.execute(image1);
         File output1 = new File("src/images/"+filename+"-c.png");
         ImageIO.write(bi1, "png", output1); 
          
-        /*--------- Erode ----------*/
+        /*-------------- Erode -------------*/
         BufferedImage image3 = ReadBI2Gray("src/images/"+filename+"-c.png");                
         AbstractOperation erode3 = new Erosion();
         BufferedImage bi3 = erode3.execute(image3);
         File output3 = new File("src/images/"+filename+"-e.png");
         ImageIO.write(bi3, "png", output3);  
         
-        /*--------- Closing ----------*/
-        BufferedImage image2 = ReadBI2Gray("src/images/"+filename+"-e.png");                
-        AbstractOperation closing = new Closing();
-        BufferedImage bi2 = closing.execute(image2);
-        File output2 = new File("src/images/"+filename+"-f.png");
-        ImageIO.write(bi2, "png", output2);         
-                
-    }
+        /*----------- Binarization ----------*/
+        //OtsuBinarize otsu = new OtsuBinarize("src/images/"+filename+"-e.png");
+        //String filename = otsu.run("src/images/OtsuBin");
+       
+        /*------- Sobel Edge Detection ------*/
+        Sobel sobel = new Sobel();
+        sobel.process("src/images/"+filename+"-e.png");        
+        ImageWrite(sobel.Magnitute, "src/images/Magnitude.png");    
         
-   
+        /*------------------ Otsu Binarize ----------------------*/
+        OtsuBinarize otsu = new OtsuBinarize("src/images/Magnitude.png");
+        otsu.run("src/images/OtsuBin"); 
+        
+    }
+
     /*--------------------------------------------------------------------------------------------*/
     private static void ProcessHough(String filename) throws IOException {
         
         BufferedImage gray = ReadBI2Gray("src/images/"+filename+"-a.png");
         HoughTransformation hough = new HoughTransformation(
-                180
+                360
                 , gray.getWidth()
                 , gray.getHeight());
         hough.addPoints(gray);
@@ -54,7 +61,7 @@ public class Main {
         
         File outputfile = new File("src/images/"+filename+"-b.png");
         ImageIO.write(oimage, "png", outputfile);
-    }
+    }     
     /*--------------------------------------------------------------------------------------------*/          
     private static BufferedImage ReadBI2Gray(String filename) throws IOException {
         
@@ -70,6 +77,23 @@ public class Main {
         op.filter(image,gray);
         return gray;
     }
-    /*--------------------------------------------------------------------------------------------*/      
+    /*--------------------------------------------------------------------------------------------*/    
+    public static void ImageWrite(double img[][], String filename) throws IOException {
+
+            BufferedImage bi = new BufferedImage(img[0].length, img.length, BufferedImage.TYPE_INT_RGB);
+
+            for (int i = 0; i < bi.getHeight(); ++i) {
+                for (int j = 0; j < bi.getWidth(); ++j) {
+                    int val = (int) img[i][j];
+                    int pixel = (val << 16) | (val << 8) | (val);
+                    bi.setRGB(j, i, pixel);
+                }
+            }
+
+            File outputfile = new File(filename);
+            ImageIO.write(bi, "png", outputfile);
+    }
+    /*--------------------------------------------------------------------------------------------*/     
+    
     
 }
