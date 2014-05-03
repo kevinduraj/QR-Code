@@ -19,38 +19,38 @@ public class Main {
         ProcessHough(filename);    
                 
         /*-------------- Opening -----------*/
-        BufferedImage image1 = ReadBI2Gray("src/images/"+filename+"-b.png");                
+        BufferedImage image1 = ReadBI2Gray("src/output/"+filename+"-b.png");                
         AbstractOperation opening1 = new Opening();
         BufferedImage bi1 = opening1.execute(image1);
-        File output1 = new File("src/images/"+filename+"-c.png");
+        File output1 = new File("src/output/"+filename+"-c.png");
         ImageIO.write(bi1, "png", output1); 
          
         /*-------------- Erode -------------*/
-        BufferedImage image3 = ReadBI2Gray("src/images/"+filename+"-c.png");                
+        BufferedImage image3 = ReadBI2Gray("src/output/"+filename+"-c.png");                
         AbstractOperation erode3 = new Erosion();
         BufferedImage bi3 = erode3.execute(image3);
-        File output3 = new File("src/images/"+filename+"-e.png");
+        File output3 = new File("src/output/"+filename+"-e.png");
         ImageIO.write(bi3, "png", output3);  
         
         /*----------- Binarization ----------*/
-        //OtsuBinarize otsu = new OtsuBinarize("src/images/"+filename+"-e.png");
-        //String filename = otsu.run("src/images/OtsuBin");
+        //OtsuBinarize otsu = new OtsuBinarize("src/output/"+filename+"-e.png");
+        //String filename = otsu.run("src/output/OtsuBin");
        
         /*------- Sobel Edge Detection ------*/
         Sobel sobel = new Sobel();
-        sobel.process("src/images/"+filename+"-e.png");        
-        ImageWrite(sobel.Magnitute, "src/images/Magnitude.png");    
+        sobel.process("src/output/"+filename+"-e.png");        
+        ImageWrite(sobel.Magnitute, "src/output/"+filename+"-magnitude.png");    
         
         /*------------------ Otsu Binarize ----------------------*/
-        OtsuBinarize otsu = new OtsuBinarize("src/images/Magnitude.png");
-        otsu.run("src/images/OtsuBin"); 
+        OtsuBinarize otsu = new OtsuBinarize("src/output/"+filename+"-magnitude.png");
+        otsu.run("src/output2/"+filename+"-otsu"); 
         
     }
 
     /*--------------------------------------------------------------------------------------------*/
     private static void ProcessHough(String filename) throws IOException {
         
-        BufferedImage gray = ReadBI2Gray("src/images/"+filename+"-a.png");
+        BufferedImage gray = ReadBI2Gray("src/images/"+filename+".png");
         HoughTransformation hough = new HoughTransformation(
                 360
                 , gray.getWidth()
@@ -59,7 +59,7 @@ public class Main {
         System.out.println("Total Points: " + hough.totalPoints);
         BufferedImage oimage = hough.getHoughImage();
         
-        File outputfile = new File("src/images/"+filename+"-b.png");
+        File outputfile = new File("src/output/"+filename+"-b.png");
         ImageIO.write(oimage, "png", outputfile);
     }     
     /*--------------------------------------------------------------------------------------------*/          
