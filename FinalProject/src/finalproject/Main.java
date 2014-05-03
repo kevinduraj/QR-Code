@@ -8,28 +8,34 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-/*------------------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------*/
 public class Main {
 
     private static String filename;
     
+    /*---------------------------------------------------------------------------------------*/
     public static void main(String[] args) throws IOException {
 
-        filename = "qrcode3";
-        ProcessHough(filename);    
-                
+        DetectQRCode("qrcode3");
+        
+    }
+    /*---------------------------------------------------------------------------------------*/
+    private static void DetectQRCode(String filename) throws IOException {
+        
+        ProcessHough(filename);
+        
         /*-------------- Opening -----------*/
-        BufferedImage image1 = ReadBI2Gray("src/output/"+filename+"-b.png");                
+        BufferedImage image1 = ReadBI2Gray("src/output1/"+filename+"a-hough.png");                
         AbstractOperation opening1 = new Opening();
         BufferedImage bi1 = opening1.execute(image1);
-        File output1 = new File("src/output/"+filename+"-c.png");
-        ImageIO.write(bi1, "png", output1); 
-         
+        File output1 = new File("src/output1/"+filename+"b-opening.png");
+        ImageIO.write(bi1, "png", output1);
+        
         /*-------------- Erode -------------*/
-        BufferedImage image3 = ReadBI2Gray("src/output/"+filename+"-c.png");                
+        BufferedImage image3 = ReadBI2Gray("src/output1/"+filename+"b-opening.png");                
         AbstractOperation erode3 = new Erosion();
         BufferedImage bi3 = erode3.execute(image3);
-        File output3 = new File("src/output/"+filename+"-e.png");
+        File output3 = new File("src/output1/"+filename+"c-erode.png");
         ImageIO.write(bi3, "png", output3);  
         
         /*----------- Binarization ----------*/
@@ -38,16 +44,15 @@ public class Main {
        
         /*------- Sobel Edge Detection ------*/
         Sobel sobel = new Sobel();
-        sobel.process("src/output/"+filename+"-e.png");        
-        ImageWrite(sobel.Magnitute, "src/output/"+filename+"-magnitude.png");    
+        sobel.process("src/output1/"+filename+"c-erode.png");
+        ImageWrite(sobel.Magnitute, "src/output1/"+filename+"e-magnitude.png");    
         
         /*------------------ Otsu Binarize ----------------------*/
-        OtsuBinarize otsu = new OtsuBinarize("src/output/"+filename+"-magnitude.png");
-        otsu.run("src/output2/"+filename+"-otsu"); 
-        
+        OtsuBinarize otsu = new OtsuBinarize("src/output1/"+filename+"e-magnitude.png");
+        otsu.run("src/output2/"+filename+"-otsu");
     }
 
-    /*--------------------------------------------------------------------------------------------*/
+    /*---------------------------------------------------------------------------------------*/
     private static void ProcessHough(String filename) throws IOException {
         
         BufferedImage gray = ReadBI2Gray("src/images/"+filename+".png");
@@ -59,7 +64,7 @@ public class Main {
         System.out.println("Total Points: " + hough.totalPoints);
         BufferedImage oimage = hough.getHoughImage();
         
-        File outputfile = new File("src/output/"+filename+"-b.png");
+        File outputfile = new File("src/output1/"+filename+"a-hough.png");
         ImageIO.write(oimage, "png", outputfile);
     }     
     /*--------------------------------------------------------------------------------------------*/          
@@ -77,7 +82,7 @@ public class Main {
         op.filter(image,gray);
         return gray;
     }
-    /*--------------------------------------------------------------------------------------------*/    
+    /*---------------------------------------------------------------------------------------*/    
     public static void ImageWrite(double img[][], String filename) throws IOException {
 
             BufferedImage bi = new BufferedImage(img[0].length, img.length, BufferedImage.TYPE_INT_RGB);
@@ -93,7 +98,7 @@ public class Main {
             File outputfile = new File(filename);
             ImageIO.write(bi, "png", outputfile);
     }
-    /*--------------------------------------------------------------------------------------------*/     
+    /*---------------------------------------------------------------------------------------*/     
     
     
 }
