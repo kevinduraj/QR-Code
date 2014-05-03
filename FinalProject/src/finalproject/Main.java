@@ -12,16 +12,19 @@ import javax.imageio.ImageIO;
                             QR Code Detection
 /-------------------------------------------------------------------------------------------*/
 public class Main {
-
     
     /*---------------------------------------------------------------------------------------*/
     public static void main(String[] args) throws IOException {
 
-        String output = DetectQRCode("qrcode2");
+        String output = DetectQRCode("qrcode1");
         System.out.println("6. output = " + output);
         
         int[][] out = ImageRead(output);
-        Probability(out);
+        if(Probability(out) == 4) {
+            System.out.println("*** Image QR Code Detected ***\n");
+        } else {
+            System.out.println("--- NOT QR Code Image ---\n");
+        }
         
     }
     /*---------------------------------------------------------------------------------------*/
@@ -135,25 +138,32 @@ public class Main {
         }   
     }   
     /*----------------------------------------------------------------------------------------*/    
-    private static void Probability(int[][] image) {
+    private static int Probability(int[][] image) {
         int h = image.length;
         int w = image[0].length;
         int half = (int) h /2;
+        int fourLines = 0;
         
-        int range1 = (int) (half-(half*0.03));
-        int range2 = (int) (half+(half*0.03)+2);
-        
+        int range1 = (int) (half-(half*0.03));    // compute top 3% from middle 
+        int range2 = (int) (half+(half*0.03)+2);  // computer bottom 3% from middle
+        int isLine=0;
         
         for (int height = range1; height < range2; height++) {
-            System.out.format("%3d ", height);
-            
+            //System.out.format("%3d. ", height);
+            isLine=0;
             for (int width = 0; width < w; width++) {
 
-                System.out.format("%3d ", image[height][width]);
+                //System.out.format("%3d ", image[height][width]);
+                isLine += image[height][width];
             }
-            System.out.println();
+            int average = isLine/w;
+            //System.out.println("Total=" + average + "  ");
+            if(average > 200) {
+                fourLines++;
+            }
         }
-        System.out.println();
+        //System.out.println();
+        return fourLines;
     } 
     /*----------------------------------------------------------------------------------------*/
     
