@@ -8,6 +8,8 @@ import javax.imageio.ImageIO;
 
 public class Main {
     
+    private static final String filename = "house.png";
+    
     public static final int[][] bottomLeft = {
         { -1, 0,  0 },
         {  1, 1,  0 },
@@ -32,12 +34,10 @@ public class Main {
         { 0,  0, -1 }
     };
 
-    private static final String filename = "qrcode3.png";
     /*--------------------------------------------------------------------------------------------*/
 
     public static void main(String[] args) throws IOException {
        
-
         int[][] image = ImageRead("src/images/" + filename);
         HitAndMiss hit = new HitAndMiss(image);
 
@@ -50,7 +50,8 @@ public class Main {
         System.out.println();        
         hit.convolve( bottomRight, "bottomRight");        
 
-        hit.squareLength();
+        System.out.println(hit.qrcodeDetection());
+        
         ImageWrite("src/output1/" + filename, hit.outImage);
     }
     /*--------------------------------------------------------------------------------------------*/
